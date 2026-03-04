@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState } from "react"
+import { v4 as uuidv4 } from 'uuid';
 
 function App() {
   const [todos, setTodos] = useState([]);
@@ -11,12 +12,25 @@ function App() {
   function addTodo(event) {
     event.preventDefault();
     if (inputValue.trim() === "") return;
-    setTodos(prev => [...prev, inputValue]);  // Functional update
+    const newTodo = {
+      id: uuidv4(),
+      text: inputValue,
+      completed: false
+    };
+    console.log(newTodo);
+    setTodos(prev => [...prev, newTodo]);  
     setInputValue("");
   }
 
   function deleteTodo(indexToRemove) {
-    setTodos(prev => prev.filter((_, index) => index !== indexToRemove));  // ✅ Fixed
+    setTodos(prev => prev.filter((todo) => todo.id !== indexToRemove));  
+  }
+
+  function toggleComplete(idToToggle)
+  {
+    setTodos(prev => prev.map(todo =>
+      todo.id === idToToggle ? {...todo, completed: !todo.completed} : todo
+    ));
   }
 
   return (
@@ -34,10 +48,18 @@ function App() {
 
       <div>
         <ul>
-          {todos.map((todo, index) => (
-            <li key={index}>
-              {todo}
-              <button onClick={() => deleteTodo(index)}>Delete</button>
+          {todos.map((todo) => (
+            <li key={todo.id}>
+              <input
+                type="checkbox"
+                checked={todo.completed}
+                onChange={() => toggleComplete(todo.id)}
+              />
+
+              <span style={{textDecoration: todo.completed ? 'line-through' : 'none'}}>
+                {todo.text}
+              </span>
+              <button onClick={() => deleteTodo(todo.id)}>Delete</button>
             </li>
           ))}
         </ul>
