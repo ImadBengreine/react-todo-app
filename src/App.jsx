@@ -1,34 +1,32 @@
-import {useState} from 'react'
+import { useState } from "react";
 
 function App() {
   const [todos, setTodos] = useState([]);
-
   const [inputValue, setInputValue] = useState("");
 
   function handleInputChange(event) {
     setInputValue(event.target.value);
   }
 
-  function addTodo(event)
-  {
+  function addTodo(event) {
     event.preventDefault();
-
-    if(inputValue.trim() === "") return;
-
-    setTodos([...todos, inputValue]);
-
+    if (inputValue.trim() === "") return;
+    setTodos(prev => [...prev, inputValue]);  // Functional update
     setInputValue("");
   }
+
+  function deleteTodo(indexToRemove) {
+    setTodos(prev => prev.filter((_, index) => index !== indexToRemove));  // ✅ Fixed
+  }
+
   return (
     <>
       <h1>To Do List</h1>
-      
-      {/* Form handles submit (Enter key or button click) */}
       <form onSubmit={addTodo}>
-        <input 
-          type="text" 
-          value={inputValue}        // Controlled input
-          onChange={handleInputChange}  // Update on every keystroke
+        <input
+          type="text"
+          value={inputValue}
+          onChange={handleInputChange}
           placeholder="Enter a task"
         />
         <button type="submit">Add task</button>
@@ -36,9 +34,11 @@ function App() {
 
       <div>
         <ul>
-          {/* Loop through todos array */}
           {todos.map((todo, index) => (
-            <li key={index}>{todo}</li>
+            <li key={index}>
+              {todo}
+              <button onClick={() => deleteTodo(index)}>Delete</button>
+            </li>
           ))}
         </ul>
       </div>
